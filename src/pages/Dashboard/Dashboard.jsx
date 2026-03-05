@@ -6,8 +6,18 @@ import CheckOutForm from "./CheckOutForm";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 
+import { useSearchParams } from "react-router-dom";
+
 const Dashboard = () => {
-  const [activeTab, setActiveTab] = useState(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get("tab");
+  const setActiveTab = (tab) => {
+    if (tab) {
+      setSearchParams({ tab });
+    } else {
+      setSearchParams({});
+    }
+  };
   const { t, i18n } = useTranslation();
   const isRtl = i18n.language === 'ar';
 

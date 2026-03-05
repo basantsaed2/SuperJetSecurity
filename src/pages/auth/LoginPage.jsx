@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { FormInput } from "@/components/custom/FormInput";
 import { usePost } from "@/hooks/usePost";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 
 const LoginPage = () => {
     const navigate = useNavigate();
@@ -20,6 +21,14 @@ const LoginPage = () => {
         const newLang = i18n.language === "en" ? "ar" : "en";
         i18n.changeLanguage(newLang);
     };
+
+    React.useEffect(() => {
+        const token = localStorage.getItem("user_token");
+        if (token) {
+            toast.info(t('already_logged_in'));
+            navigate("/dashboard", { replace: true });
+        }
+    }, [navigate, t]);
 
     const loginSchema = z.object({
         identifier: z.string().min(1, t('identifier_label') + " is required"),

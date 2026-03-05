@@ -16,6 +16,7 @@ const resources = {
       "login_button": "Login",
       "hello": "Hello",
       "welcome_back": "welcome back!",
+      "already_logged_in": "You are already logged in",
 
       // --- Dashboard ---
       "main_menu": "Main Menu",
@@ -72,6 +73,7 @@ const resources = {
       "login_button": "دخول",
       "hello": "أهلاً",
       "welcome_back": "مرحباً بك مجدداً!",
+      "already_logged_in": "أنت مسجل الدخول بالفعل",
 
       // --- Dashboard ---
       "main_menu": "القائمة الرئيسية",
