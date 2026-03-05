@@ -408,20 +408,15 @@ const SearchableSelect = ({ options, onValueChange, defaultValue, placeholder, t
       onOpenChange={(open) => {
         if (open) {
           setSearchTerm("");
-          // Increased delay for mobile browser rendering stability
           setTimeout(() => {
-            if (inputRef.current) {
-              inputRef.current.focus({ preventScroll: true });
-            }
-          }, 150);
+            if (inputRef.current) inputRef.current.focus({ preventScroll: true });
+          }, 200);
         }
       }}
     >
       <SelectTrigger dir={dir} className={cn(
-        "w-full min-h-[48px] h-[48px] px-4 bg-slate-50/50 border-slate-200 transition-all duration-300 rounded-xl shadow-sm",
-        "hover:border-blue-300 hover:bg-white hover:shadow-md",
-        "focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 focus:shadow-lg focus:bg-white data-[state=open]:bg-white data-[state=open]:border-blue-500",
-        hasError && "border-red-500 focus:border-red-500 focus:ring-red-500/10"
+        "w-full min-h-[48px] h-[48px] px-4 bg-slate-50/50 border-slate-200 rounded-xl shadow-sm transition-all",
+        hasError && "border-red-500 focus:ring-red-500/10"
       )}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
@@ -429,12 +424,12 @@ const SearchableSelect = ({ options, onValueChange, defaultValue, placeholder, t
         dir={dir}
         side="bottom"
         position="popper"
-        className="w-[var(--radix-select-trigger-width)] z-[150] bg-white border-slate-200 p-0 shadow-2xl overflow-hidden rounded-2xl"
-        // Prevent focus jumping back to trigger on mobile which closes the menu
+        sideOffset={5}
+        className="w-[var(--radix-select-trigger-width)] z-[150] bg-white border-slate-200 p-0 shadow-2xl rounded-2xl overflow-hidden"
         onCloseAutoFocus={(e) => e.preventDefault()}
       >
-        <div className="sticky top-0 bg-white p-2 border-b border-slate-100 z-40">
-          <div className="relative">
+        <div className="sticky top-0 bg-white p-2 border-b border-slate-100 z-50">
+          <div className="relative" onPointerDown={(e) => e.stopPropagation()}>
             <Search className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400", isRtl ? "right-3" : "left-3")} />
             <Input
               ref={inputRef}
@@ -442,23 +437,22 @@ const SearchableSelect = ({ options, onValueChange, defaultValue, placeholder, t
               value={searchTerm}
               dir={dir}
               inputMode="search"
+              autoComplete="off"
               onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === ' ') e.stopPropagation();
-              }}
-              className={cn("h-9 text-xs focus-visible:ring-0 focus-visible:ring-offset-0 bg-slate-100/50 border-transparent rounded-lg", isRtl ? "pr-9 pl-3" : "pl-9 pr-3")}
+              onKeyDown={(e) => { if (e.key === ' ') e.stopPropagation(); }}
+              className={cn("h-10 text-sm focus-visible:ring-0 bg-slate-100/50 border-transparent rounded-lg", isRtl ? "pr-9 pl-3" : "pl-9 pr-3")}
             />
           </div>
         </div>
-        <div className="p-1.5 max-h-[220px] overflow-y-auto">
+        <div className="p-1.5 max-h-[250px] overflow-y-auto overscroll-contain custom-scrollbar">
           {filteredOptions.length > 0 ? (
             filteredOptions.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value} className="text-sm rounded-lg py-2 focus:bg-blue-50 focus:text-blue-700 transition-colors">
+              <SelectItem key={opt.value} value={opt.value} className="text-sm rounded-lg py-3 px-4 focus:bg-blue-50 transition-colors">
                 {opt.label}
               </SelectItem>
             ))
           ) : (
-            <div className="p-6 text-center text-xs text-slate-400 font-medium">
+            <div className="p-8 text-center text-xs text-slate-400 font-medium">
               {t('no_records_found')}
             </div>
           )}

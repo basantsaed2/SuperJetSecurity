@@ -227,7 +227,6 @@
 // };
 
 // export default CheckInForm;
-
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { Bus, Save, Loader2, QrCode, XCircle, RefreshCw, CheckCircle2 } from "lucide-react";
@@ -245,31 +244,24 @@ const CheckInForm = ({ defaultTime }) => {
   const { t, i18n } = useTranslation();
   const isRtl = i18n.language === "ar";
   const [isScanning, setIsScanning] = useState(false);
-  const [scannedBusNumber, setScannedBusNumber] = useState(null); // تخزين رقم الحافلة الممسوح
+  const [scannedBusNumber, setScannedBusNumber] = useState(null);
   const html5QrCodeRef = useRef(null);
 
-  const { data: buses } = useGet(["buses"], "/api/user/security/buses", { refetchOnWindowFocus: false });
-  const { data: mainTypes } = useGet(["mainTypes"], "/api/user/security/maintenance-types", { refetchOnWindowFocus: false });
+  const { data: buses } = useGet(["buses"], "/api/user/security/buses");
+  const { data: mainTypes } = useGet(["mainTypes"], "/api/user/security/maintenance-types");
 
   const busesList = useMemo(() => buses?.data || [], [buses]);
 
   const { register, handleSubmit, watch, reset, setValue, formState: { errors } } = useForm({
-    defaultValues: {
-      checkInTime: defaultTime,
-      maintenanceTypeIds: [],
-      description: "",
-      bus_id: ""
-    }
+    defaultValues: { checkInTime: defaultTime, maintenanceTypeIds: [], description: "", bus_id: "" }
   });
 
   const selectedBusId = watch("bus_id");
 
   const stopScanner = async () => {
-    if (html5QrCodeRef.current && html5QrCodeRef.current.isScanning) {
-      try {
-        await html5QrCodeRef.current.stop();
-        html5QrCodeRef.current.clear();
-      } catch (err) { console.error(err); }
+    if (html5QrCodeRef.current?.isScanning) {
+      await html5QrCodeRef.current.stop();
+      html5QrCodeRef.current.clear();
     }
     setIsScanning(false);
   };
@@ -282,16 +274,18 @@ const CheckInForm = ({ defaultTime }) => {
         { facingMode: "environment" },
         { fps: 15, qrbox: { width: 250, height: 250 } },
         (decodedText) => {
-          setValue("bus_id", decodedText);
+          setValue("bus_id", decodedText, { shouldValidate: true });
           const foundBus = busesList.find(b => String(b.id) === String(decodedText));
           setScannedBusNumber(foundBus ? foundBus.busNumber : decodedText);
-          toast.success(t("qr_scan_success") || "تم التعرف على الحافلة");
+          toast.success(t("qr_scan_success"));
           stopScanner();
         }
       ).catch(() => setIsScanning(false));
     }
     return () => { if (html5QrCodeRef.current?.isScanning) html5QrCodeRef.current.stop(); };
-  }, [isScanning, setValue, busesList]);
+  }, [isScanning, setValue, busesList, t]);
+
+  const checkInMutation = usePost(`/api/user/security/check-in/${selectedBusId}`, ["buses"], t('register_entry_button'));
 
   const onSubmit = (data) => {
     const { bus_id, ...payload } = data;
@@ -303,118 +297,68 @@ const CheckInForm = ({ defaultTime }) => {
     });
   };
 
-  const checkInMutation = usePost(`/api/user/security/check-in/${selectedBusId}`, ["buses"], t('register_entry_button'));
-
   return (
-    <div className="bg-white rounded-[2.5rem] shadow-xl overflow-hidden animate-in fade-in zoom-in-95">
-      <div className={cn(THEME.colors.primary, "p-4 md:p-8 text-white flex justify-between items-center")}>
+    <div className="bg-white rounded-[2.5rem] shadow-xl overflow-hidden animate-in fade-in zoom-in-95 max-w-2xl mx-auto">
+      <div className={cn(THEME.colors.primary, "p-6 text-white flex justify-between items-center")}>
         <div className="flex items-center gap-3">
-          <Bus size={32} className="text-[#FFCC00]" />
-          <h2 className="text-xl md:text-2xl font-black uppercase tracking-tight">{t('gate_entry_title')}</h2>
+          <Bus size={28} className="text-[#FFCC00]" />
+          <h2 className="text-xl font-black uppercase tracking-tight">{t('gate_entry_title')}</h2>
         </div>
       </div>
 
-      <div className="p-4 md:p-8 space-y-6">
-
-        {/* شاشة الكاميرا */}
+      <div className="p-6 space-y-6">
         {isScanning && (
-          <div className="relative border-4 border-dashed border-[#003366]/20 rounded-[2rem] overflow-hidden bg-slate-900 aspect-square max-h-[400px] mx-auto w-full mb-6 shadow-2xl">
+          <div className="relative border-4 border-dashed border-[#003366]/20 rounded-[2rem] overflow-hidden bg-slate-900 aspect-square w-full mb-6">
             <div id="reader" className="w-full h-full"></div>
-            <button type="button" onClick={stopScanner} className={cn("absolute top-4 z-20 text-white bg-black/50 rounded-full p-2", isRtl ? "left-4" : "right-4")}>
-              <XCircle size={28} />
+            <button onClick={stopScanner} className={cn("absolute top-4 z-20 text-white bg-black/50 p-2 rounded-full", isRtl ? "left-4" : "right-4")}>
+              <XCircle size={24} />
             </button>
           </div>
         )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-
-          {/* المنطقة الديناميكية: إما اختيار أو عرض النتيجة */}
           {!isScanning && (
-            <div className="animate-in fade-in slide-in-from-top-2">
+            <div className="transition-all duration-500">
               {scannedBusNumber ? (
-                /* بطاقة عرض الحافلة المختارة */
-                <div className="bg-slate-50 border-2 border-[#003366] rounded-[2rem] p-6 flex items-center justify-between shadow-inner">
+                <div className="bg-slate-50 border-2 border-[#003366] rounded-[2rem] p-5 flex items-center justify-between shadow-sm animate-in zoom-in-95">
                   <div className="flex items-center gap-4">
-                    <div className="bg-[#003366] p-3 rounded-2xl text-white shadow-lg">
-                      <CheckCircle2 size={24} />
-                    </div>
+                    <div className="bg-[#003366] p-3 rounded-2xl text-white"><CheckCircle2 size={24} /></div>
                     <div>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t('selected_bus') || "الحافلة المختارة"}</p>
-                      <h4 className="text-2xl font-black text-[#003366]">{scannedBusNumber}</h4>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase">{t('selected_bus')}</p>
+                      <h4 className="text-xl font-black text-[#003366]">{scannedBusNumber}</h4>
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => { setScannedBusNumber(null); setValue("bus_id", ""); }}
-                    className="flex flex-col items-center gap-1 text-red-500 hover:bg-red-50 p-3 rounded-2xl transition-all active:scale-90"
-                  >
+                  <button type="button" onClick={() => { setScannedBusNumber(null); setValue("bus_id", ""); }} className="text-red-500 p-2 hover:bg-red-50 rounded-xl transition-all">
                     <RefreshCw size={20} />
-                    <span className="text-[10px] font-bold uppercase">{t('change') || "تغيير"}</span>
                   </button>
                 </div>
               ) : (
-                /* حقل الاختيار والمسح العادي */
                 <div className="flex items-end gap-3">
-                  <div className="flex-1">
-                    <FormInput
-                      label={t('select_bus_label')}
-                      name="bus_id"
-                      type="select"
-                      register={register}
-                      errors={errors}
-                      options={useMemo(() => busesList.map(b => ({ label: `${b.busNumber}`, value: b.id })), [busesList])}
-                      placeholder={t('select_bus_placeholder')}
-                    />
-                  </div>
-                  <Button
-                    type="button"
-                    onClick={() => setIsScanning(true)}
-                    className="h-14 w-14 rounded-2xl bg-[#003366] text-white shadow-lg active:scale-90 shrink-0"
-                  >
-                    <QrCode size={24} />
+                  <FormInput
+                    label={t('select_bus_label')}
+                    name="bus_id"
+                    type="select"
+                    register={register}
+                    errors={errors}
+                    setValue={setValue}
+                    options={busesList.map(b => ({ label: b.busNumber, value: b.id }))}
+                    placeholder={t('select_bus_placeholder')}
+                    className="flex-1"
+                  />
+                  <Button type="button" onClick={() => setIsScanning(true)} className="h-12 w-12 rounded-xl bg-[#003366] shrink-0 active:scale-95 shadow-lg">
+                    <QrCode size={20} />
                   </Button>
                 </div>
               )}
             </div>
           )}
 
-          {/* باقي الحقول تظهر دائماً */}
-          <FormInput
-            label={t('maintenance_label')}
-            name="maintenanceTypeIds"
-            type="select"
-            multiple={true}
-            watch={watch}
-            setValue={setValue}
-            register={register}
-            errors={errors}
-            options={mainTypes?.data?.map(type => ({ label: type.name, value: type.id })) || []}
-            placeholder={t('maintenance_placeholder')}
-          />
+          <FormInput label={t('maintenance_label')} name="maintenanceTypeIds" type="select" multiple setValue={setValue} watch={watch} register={register} errors={errors} options={mainTypes?.data?.map(t => ({ label: t.name, value: t.id })) || []} placeholder={t('maintenance_placeholder')} />
+          <FormInput label={t('description_label')} name="description" type="textarea" register={register} errors={errors} placeholder={t('description_placeholder')} />
+          <FormInput label={t('entry_time_label')} name="checkInTime" type="datetime-local" register={register} errors={errors} />
 
-          <FormInput
-            label={t('description_label')}
-            name="description"
-            type="textarea"
-            register={register}
-            errors={errors}
-            placeholder={t('description_placeholder')}
-          />
-
-          <FormInput
-            label={t('entry_time_label')}
-            name="checkInTime"
-            type="datetime-local"
-            register={register}
-            errors={errors}
-          />
-
-          <Button
-            type="submit"
-            disabled={checkInMutation.isPending || !selectedBusId}
-            className={`w-full h-16 ${THEME.colors.primary} text-white text-lg font-black rounded-2xl shadow-xl active:scale-[0.98] uppercase`}
-          >
-            {checkInMutation.isPending ? <Loader2 className="animate-spin" /> : <span><Save size={22} className="inline mr-2" /> {t('register_entry_button')}</span>}
+          <Button type="submit" disabled={checkInMutation.isPending || !selectedBusId} className="w-full h-14 bg-[#003366] text-white font-black rounded-2xl shadow-lg hover:opacity-90 transition-all">
+            {checkInMutation.isPending ? <Loader2 className="animate-spin" /> : t('register_entry_button')}
           </Button>
         </form>
       </div>
