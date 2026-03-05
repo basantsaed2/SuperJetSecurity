@@ -248,8 +248,8 @@ const CheckInForm = ({ defaultTime }) => {
   const [scannedBusNumber, setScannedBusNumber] = useState(null); // تخزين رقم الحافلة الممسوح
   const html5QrCodeRef = useRef(null);
 
-  const { data: buses } = useGet(["buses"], "/api/user/security/buses");
-  const { data: mainTypes } = useGet(["mainTypes"], "/api/user/security/maintenance-types");
+  const { data: buses } = useGet(["buses"], "/api/user/security/buses", { refetchOnWindowFocus: false });
+  const { data: mainTypes } = useGet(["mainTypes"], "/api/user/security/maintenance-types", { refetchOnWindowFocus: false });
 
   const busesList = useMemo(() => buses?.data || [], [buses]);
 

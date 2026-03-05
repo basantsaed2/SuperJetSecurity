@@ -11,11 +11,11 @@ const Dashboard = () => {
   const { t, i18n } = useTranslation();
   const isRtl = i18n.language === 'ar';
 
-  const getCurrentDateTime = () => {
+  const defaultTime = React.useMemo(() => {
     const now = new Date();
     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
     return now.toISOString().slice(0, 16);
-  };
+  }, []);
 
   return (
     <div className={`min-h-screen ${THEME.colors.grayLight} p-3 md:p-8 transition-all duration-500`} dir={isRtl ? 'rtl' : 'ltr'}>
@@ -102,7 +102,7 @@ const Dashboard = () => {
           ) : (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
               {activeTab === "check-in" ? (
-                <CheckInForm defaultTime={getCurrentDateTime()} />
+                <CheckInForm defaultTime={defaultTime} />
               ) : (
                 <CheckOutForm />
               )}

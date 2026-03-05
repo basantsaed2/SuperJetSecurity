@@ -405,7 +405,6 @@ const SearchableSelect = ({ options, onValueChange, defaultValue, placeholder, t
     <Select
       onValueChange={onValueChange}
       defaultValue={defaultValue}
-      modal={false}
       onOpenChange={(open) => {
         if (open) {
           setSearchTerm("");
@@ -504,7 +503,6 @@ const MultiSelect = ({ options, value = [], onChange, placeholder, t, hasError, 
 
   return (
     <DropdownMenu
-      modal={false}
       onOpenChange={(open) => {
         if (open) {
           setSearchTerm("");
