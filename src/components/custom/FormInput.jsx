@@ -367,17 +367,9 @@
 //     </div>
 //   );
 // };
-
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -390,9 +382,10 @@ import { useTranslation } from "react-i18next";
 import { Search, ChevronDown, CheckSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-// --- Searchable Single Select ---
-const SearchableSelect = ({ options, onValueChange, defaultValue, placeholder, t, hasError, dir }) => {
+// --- Searchable Single Select (المعدل ليعمل باستقرار على الموبايل) ---
+const SearchableSelect = ({ options, onValueChange, value, placeholder, t, hasError, dir }) => {
   const [searchTerm, setSearchTerm] = React.useState("");
+  const [open, setOpen] = React.useState(false);
   const inputRef = React.useRef(null);
   const isRtl = dir === 'rtl';
 
@@ -401,35 +394,48 @@ const SearchableSelect = ({ options, onValueChange, defaultValue, placeholder, t
     [options, searchTerm]
   );
 
+  // البحث عن التسمية للقيمة المختارة حالياً لظهورها على الزر
+  const selectedLabel = options.find(opt => String(opt.value) === String(value))?.label;
+
   return (
-    <Select
-      onValueChange={onValueChange}
-      defaultValue={defaultValue}
-      onOpenChange={(open) => {
-        if (open) {
+    <DropdownMenu
+      open={open}
+      onOpenChange={(isOpen) => {
+        setOpen(isOpen);
+        if (isOpen) {
           setSearchTerm("");
           setTimeout(() => {
             if (inputRef.current) inputRef.current.focus({ preventScroll: true });
-          }, 200);
+          }, 150);
         }
       }}
     >
-      <SelectTrigger dir={dir} className={cn(
-        "w-full min-h-[48px] h-[48px] px-4 bg-slate-50/50 border-slate-200 rounded-xl shadow-sm transition-all",
-        hasError && "border-red-500 focus:ring-red-500/10"
-      )}>
-        <SelectValue placeholder={placeholder} />
-      </SelectTrigger>
-      <SelectContent
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="outline"
+          dir={dir}
+          className={cn(
+            "w-full justify-between h-[48px] px-4 bg-slate-50/50 border-slate-200 rounded-xl font-normal shadow-sm transition-all duration-300",
+            "hover:bg-white hover:border-blue-300",
+            open && "border-blue-500 bg-white ring-4 ring-blue-500/5",
+            hasError && "border-red-500 focus:ring-red-500/10",
+            !value && "text-slate-500"
+          )}
+        >
+          <span className="truncate">{selectedLabel || placeholder}</span>
+          <ChevronDown className={cn("h-4 w-4 opacity-40 shrink-0", isRtl ? "mr-2" : "ml-2")} />
+        </Button>
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent
         dir={dir}
         side="bottom"
-        position="popper"
-        sideOffset={5}
-        className="w-[var(--radix-select-trigger-width)] z-[150] bg-white border-slate-200 p-0 shadow-2xl rounded-2xl overflow-hidden"
+        align={isRtl ? "end" : "start"}
+        className="w-[var(--radix-dropdown-menu-trigger-width)] z-[150] bg-white border-slate-200 p-0 shadow-2xl rounded-2xl"
         onCloseAutoFocus={(e) => e.preventDefault()}
       >
-        <div className="sticky top-0 bg-white p-2 border-b border-slate-100 z-50">
-          <div className="relative" onPointerDown={(e) => e.stopPropagation()}>
+        <div className="sticky top-0 bg-white p-2 border-b border-slate-100 z-40">
+          <div className="relative">
             <Search className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400", isRtl ? "right-3" : "left-3")} />
             <Input
               ref={inputRef}
@@ -440,25 +446,36 @@ const SearchableSelect = ({ options, onValueChange, defaultValue, placeholder, t
               autoComplete="off"
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyDown={(e) => { if (e.key === ' ') e.stopPropagation(); }}
-              className={cn("h-10 text-sm focus-visible:ring-0 bg-slate-100/50 border-transparent rounded-lg", isRtl ? "pr-9 pl-3" : "pl-9 pr-3")}
+              className={cn("h-9 text-xs focus-visible:ring-0 bg-slate-100/50 border-transparent rounded-lg", isRtl ? "pr-9 pl-3" : "pl-9 pr-3")}
             />
           </div>
         </div>
-        <div className="p-1.5 max-h-[250px] overflow-y-auto overscroll-contain custom-scrollbar">
+
+        <div className="p-1.5 max-h-[220px] overflow-y-auto overscroll-contain custom-scrollbar">
           {filteredOptions.length > 0 ? (
             filteredOptions.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value} className="text-sm rounded-lg py-3 px-4 focus:bg-blue-50 transition-colors">
+              <div
+                key={opt.value}
+                onClick={() => {
+                  onValueChange(opt.value);
+                  setOpen(false);
+                }}
+                className={cn(
+                  "relative flex cursor-pointer select-none items-center rounded-lg py-2.5 px-3 text-sm outline-none transition-colors hover:bg-blue-50 hover:text-blue-700",
+                  String(value) === String(opt.value) ? "bg-blue-50 text-blue-700 font-bold" : "text-slate-700"
+                )}
+              >
                 {opt.label}
-              </SelectItem>
+              </div>
             ))
           ) : (
-            <div className="p-8 text-center text-xs text-slate-400 font-medium">
+            <div className="p-6 text-center text-xs text-slate-400 font-medium">
               {t('no_records_found')}
             </div>
           )}
         </div>
-      </SelectContent>
-    </Select>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 
@@ -486,23 +503,18 @@ const MultiSelect = ({ options, value = [], onChange, placeholder, t, hasError, 
     if (areAllSelected) {
       onChange(value.filter(val => !allValues.includes(val)));
     } else {
-      const combined = [...new Set([...value, ...allValues])];
-      onChange(combined);
+      onChange([...new Set([...value, ...allValues])]);
     }
   };
 
-  const selectedLabels = options
-    .filter(opt => value.includes(opt.value))
-    .map(opt => opt.label);
+  const selectedLabels = options.filter(opt => value.includes(opt.value)).map(opt => opt.label);
 
   return (
     <DropdownMenu
       onOpenChange={(open) => {
         if (open) {
           setSearchTerm("");
-          setTimeout(() => {
-            if (inputRef.current) inputRef.current.focus({ preventScroll: true });
-          }, 150);
+          setTimeout(() => { if (inputRef.current) inputRef.current.focus({ preventScroll: true }); }, 150);
         }
       }}>
       <DropdownMenuTrigger asChild>
@@ -511,9 +523,8 @@ const MultiSelect = ({ options, value = [], onChange, placeholder, t, hasError, 
           dir={dir}
           className={cn(
             "w-full justify-between h-auto min-h-[48px] px-4 py-2 bg-slate-50/50 border-slate-200 transition-all duration-300 rounded-xl font-normal shadow-sm",
-            "hover:bg-white hover:border-blue-300 hover:shadow-md",
-            "focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 focus:shadow-lg focus:bg-white data-[state=open]:bg-white data-[state=open]:border-blue-500",
-            hasError && "border-red-500 hover:border-red-500 focus:border-red-500 focus:ring-red-500/10",
+            "hover:bg-white hover:border-blue-300",
+            hasError && "border-red-500 focus:ring-red-500/10",
             !value.length && "text-slate-500"
           )}
         >
@@ -552,10 +563,8 @@ const MultiSelect = ({ options, value = [], onChange, placeholder, t, hasError, 
               dir={dir}
               inputMode="search"
               onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === ' ') e.stopPropagation();
-              }}
-              className={cn("h-9 text-xs focus-visible:ring-0 focus-visible:ring-offset-0 bg-slate-100/50 border-transparent rounded-lg", isRtl ? "pr-9 pl-3" : "pl-9 pr-3")}
+              onKeyDown={(e) => { if (e.key === ' ') e.stopPropagation(); }}
+              className={cn("h-9 text-xs focus-visible:ring-0 bg-slate-100/50 border-transparent rounded-lg", isRtl ? "pr-9 pl-3" : "pl-9 pr-3")}
             />
           </div>
           {filteredOptions.length > 0 && (
@@ -564,11 +573,7 @@ const MultiSelect = ({ options, value = [], onChange, placeholder, t, hasError, 
                 type="button"
                 variant="ghost"
                 size="sm"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  selectAll();
-                }}
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); selectAll(); }}
                 className={cn("w-full h-8 font-bold text-[10px] text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg px-2", isRtl ? "justify-end" : "justify-start")}
               >
                 <CheckSquare className={cn("w-3.5 h-3.5", isRtl ? "ml-2" : "mr-2")} />
@@ -591,9 +596,7 @@ const MultiSelect = ({ options, value = [], onChange, placeholder, t, hasError, 
               </DropdownMenuCheckboxItem>
             ))
           ) : (
-            <div className="p-6 text-center text-xs text-slate-400 font-medium">
-              {t('no_records_found')}
-            </div>
+            <div className="p-6 text-center text-xs text-slate-400 font-medium">{t('no_records_found')}</div>
           )}
         </div>
       </DropdownMenuContent>
@@ -641,12 +644,12 @@ export const FormInput = ({
         );
 
       case "select":
+        const currentValue = watch(name);
         if (multiple && setValue && watch) {
-          const currentValue = watch(name) || [];
           return (
             <MultiSelect
               options={options}
-              value={currentValue}
+              value={currentValue || []}
               onChange={(val) => setValue(name, val, { shouldValidate: true })}
               placeholder={placeholder}
               t={t}
@@ -658,11 +661,10 @@ export const FormInput = ({
         return (
           <SearchableSelect
             options={options}
-            onValueChange={(value) => {
-              // Manually trigger react-hook-form change
-              setValue(name, value, { shouldValidate: true, shouldDirty: true });
+            value={currentValue}
+            onValueChange={(val) => {
+              setValue(name, val, { shouldValidate: true, shouldDirty: true });
             }}
-            defaultValue={props.defaultValue}
             placeholder={placeholder}
             t={t}
             hasError={hasError}
@@ -671,8 +673,8 @@ export const FormInput = ({
         );
 
       case "switch":
-        const currentValue = watch(name);
-        const isChecked = typeof currentValue === "boolean" ? currentValue : currentValue === "active";
+        const switchValue = watch(name);
+        const isChecked = typeof switchValue === "boolean" ? switchValue : switchValue === "active";
 
         return (
           <div className={cn(
@@ -682,7 +684,7 @@ export const FormInput = ({
             <Switch
               checked={isChecked}
               onCheckedChange={(checked) => {
-                const newValue = typeof currentValue === "boolean" ? checked : (checked ? "active" : "inactive");
+                const newValue = typeof switchValue === "boolean" ? checked : (checked ? "active" : "inactive");
                 setValue(name, newValue, { shouldValidate: true });
               }}
               className="data-[state=checked]:bg-green-500 data-[state=unchecked]:bg-slate-300"
