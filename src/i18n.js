@@ -55,7 +55,8 @@ const resources = {
       "no_records_found": "No records found",
       "select_all": "Select All",
       "deselect_all": "Deselect All",
-      "selected": "selected"
+      "selected": "selected",
+      "scan_qr_placeholder": "Point the camera at the bus QR code"
     }
   },
   ar: {
@@ -78,7 +79,7 @@ const resources = {
       "check_out": "تسجيل الخروج",
       "check_in_subtitle": "تسجيل الاتوبيسات القادمة",
       "check_out_subtitle": "تسجيل خروج الوحدات الحالية",
-      
+
       // --- CheckIn Form ---
       "gate_entry_title": "تسجيل دخول الاتوبيس",
       "select_bus_label": "اختر الاتوبيس",
@@ -110,7 +111,8 @@ const resources = {
       "no_records_found": "لا توجد سجلات",
       "select_all": "اختر الكل",
       "deselect_all": "إلغاء تحديد الكل",
-      "selected": "تم الاختيار"
+      "selected": "تم الاختيار",
+      "scan_qr_placeholder": "وجه الكاميرا نحو كود الـ QR الخاص بالحافلة"
     }
   }
 };
