@@ -21,9 +21,10 @@ import { Search, X, Check, ChevronDown, CheckSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 // --- Searchable Single Select ---
-const SearchableSelect = ({ options, onValueChange, defaultValue, placeholder, t, hasError }) => {
+const SearchableSelect = ({ options, onValueChange, defaultValue, placeholder, t, hasError, dir }) => {
   const [searchTerm, setSearchTerm] = React.useState("");
   const inputRef = React.useRef(null);
+  const isRtl = dir === 'rtl';
 
   const filteredOptions = React.useMemo(() =>
     options.filter(opt => opt.label.toLowerCase().includes(searchTerm.toLowerCase())),
@@ -41,7 +42,7 @@ const SearchableSelect = ({ options, onValueChange, defaultValue, placeholder, t
         }
       }}
     >
-      <SelectTrigger className={cn(
+      <SelectTrigger dir={dir} className={cn(
         "w-full min-h-[48px] h-[48px] px-4 bg-slate-50/50 border-slate-200 transition-all duration-300 rounded-xl shadow-sm",
         "hover:border-blue-300 hover:bg-white hover:shadow-md",
         "focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 focus:shadow-lg focus:bg-white data-[state=open]:bg-white data-[state=open]:border-blue-500",
@@ -49,19 +50,20 @@ const SearchableSelect = ({ options, onValueChange, defaultValue, placeholder, t
       )}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
-      <SelectContent side="bottom" position="popper" className="w-[var(--radix-select-trigger-width)] z-[150] bg-white/80 backdrop-blur-xl border-slate-200 p-0 shadow-2xl overflow-hidden rounded-2xl animate-in fade-in zoom-in-95 duration-200">
+      <SelectContent dir={dir} side="bottom" position="popper" className="w-[var(--radix-select-trigger-width)] z-[150] bg-white/80 backdrop-blur-xl border-slate-200 p-0 shadow-2xl overflow-hidden rounded-2xl animate-in fade-in zoom-in-95 duration-200">
         <div className="sticky top-0 bg-white/50 backdrop-blur-md p-2 border-b border-slate-100 z-40">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Search className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400", isRtl ? "right-3" : "left-3")} />
             <Input
               ref={inputRef}
               placeholder={t('search_by')}
               value={searchTerm}
+              dir={dir}
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === ' ') e.stopPropagation();
               }}
-              className="h-9 text-xs pl-9 pr-3 focus-visible:ring-0 focus-visible:ring-offset-0 bg-slate-100/50 border-transparent rounded-lg"
+              className={cn("h-9 text-xs focus-visible:ring-0 focus-visible:ring-offset-0 bg-slate-100/50 border-transparent rounded-lg", isRtl ? "pr-9 pl-3" : "pl-9 pr-3")}
             />
           </div>
         </div>
@@ -84,9 +86,10 @@ const SearchableSelect = ({ options, onValueChange, defaultValue, placeholder, t
 };
 
 // --- Searchable Multi Select ---
-const MultiSelect = ({ options, value = [], onChange, placeholder, t, hasError }) => {
+const MultiSelect = ({ options, value = [], onChange, placeholder, t, hasError, dir }) => {
   const [searchTerm, setSearchTerm] = React.useState("");
   const inputRef = React.useRef(null);
+  const isRtl = dir === 'rtl';
 
   const filteredOptions = React.useMemo(() =>
     options.filter(opt => opt.label.toLowerCase().includes(searchTerm.toLowerCase())),
@@ -103,12 +106,9 @@ const MultiSelect = ({ options, value = [], onChange, placeholder, t, hasError }
   const selectAll = () => {
     const allValues = filteredOptions.map(opt => opt.value);
     const areAllSelected = allValues.every(val => value.includes(val));
-
     if (areAllSelected) {
-      // If all filtered are selected, unselect them
       onChange(value.filter(val => !allValues.includes(val)));
     } else {
-      // Otherwise, select all filtered
       const combined = [...new Set([...value, ...allValues])];
       onChange(combined);
     }
@@ -128,6 +128,7 @@ const MultiSelect = ({ options, value = [], onChange, placeholder, t, hasError }
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
+          dir={dir}
           className={cn(
             "w-full justify-between h-auto min-h-[48px] px-4 py-2 bg-slate-50/50 border-slate-200 transition-all duration-300 rounded-xl font-normal shadow-sm",
             "hover:bg-white hover:border-blue-300 hover:shadow-md",
@@ -151,26 +152,28 @@ const MultiSelect = ({ options, value = [], onChange, placeholder, t, hasError }
               <span className="text-sm">{placeholder}</span>
             )}
           </div>
-          <ChevronDown className="h-4 w-4 opacity-40 shrink-0 ml-2 group-data-[state=open]:rotate-180 transition-transform" />
+          <ChevronDown className={cn("h-4 w-4 opacity-40 shrink-0 group-data-[state=open]:rotate-180 transition-transform", isRtl ? "mr-2" : "ml-2")} />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
+        dir={dir}
         side="bottom"
-        align="start"
+        align={isRtl ? "end" : "start"}
         className="w-[var(--radix-dropdown-menu-trigger-width)] z-[150] bg-white/80 backdrop-blur-xl border-slate-200 p-0 shadow-2xl overflow-hidden rounded-2xl animate-in fade-in zoom-in-95 duration-200"
       >
         <div className="sticky top-0 bg-white/50 backdrop-blur-md p-2 border-b border-slate-100 z-40">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Search className={cn("absolute top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400", isRtl ? "right-3" : "left-3")} />
             <Input
               ref={inputRef}
               placeholder={t('search_by')}
               value={searchTerm}
+              dir={dir}
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === ' ') e.stopPropagation();
               }}
-              className="h-9 text-xs pl-9 pr-3 focus-visible:ring-0 focus-visible:ring-offset-0 bg-slate-100/50 border-transparent rounded-lg"
+              className={cn("h-9 text-xs focus-visible:ring-0 focus-visible:ring-offset-0 bg-slate-100/50 border-transparent rounded-lg", isRtl ? "pr-9 pl-3" : "pl-9 pr-3")}
             />
           </div>
           {filteredOptions.length > 0 && (
@@ -184,9 +187,9 @@ const MultiSelect = ({ options, value = [], onChange, placeholder, t, hasError }
                   e.stopPropagation();
                   selectAll();
                 }}
-                className="w-full justify-start text-[10px] h-8 font-bold text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg px-2"
+                className={cn("w-full h-8 font-bold text-[10px] text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg px-2", isRtl ? "justify-end" : "justify-start")}
               >
-                <CheckSquare className="w-3.5 h-3.5 mr-2" />
+                <CheckSquare className={cn("w-3.5 h-3.5", isRtl ? "ml-2" : "mr-2")} />
                 {filteredOptions.every(opt => value.includes(opt.value)) ? t('deselect_all') : t('select_all')}
               </Button>
             </div>
@@ -266,6 +269,7 @@ export const FormInput = ({
               placeholder={placeholder}
               t={t}
               hasError={hasError}
+              dir={dir}
             />
           );
         }
@@ -277,6 +281,7 @@ export const FormInput = ({
             placeholder={placeholder}
             t={t}
             hasError={hasError}
+            dir={dir}
           />
         );
 

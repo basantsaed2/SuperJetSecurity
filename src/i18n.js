@@ -49,6 +49,13 @@ const resources = {
 
       // --- Shared ---
       "logout": "Logout",
+
+      // --- Searchable Select ---
+      "search_by": "Search by...",
+      "no_records_found": "No records found",
+      "select_all": "Select All",
+      "deselect_all": "Deselect All",
+      "selected": "selected"
     }
   },
   ar: {
@@ -97,6 +104,13 @@ const resources = {
 
       // --- Shared ---
       "logout": "تسجيل الخروج",
+
+      // --- Searchable Select ---
+      "search_by": "بحث بـ...",
+      "no_records_found": "لا توجد سجلات",
+      "select_all": "اختر الكل",
+      "deselect_all": "إلغاء تحديد الكل",
+      "selected": "تم الاختيار"
     }
   }
 };
