@@ -405,6 +405,7 @@ const SearchableSelect = ({ options, onValueChange, defaultValue, placeholder, t
     <Select
       onValueChange={onValueChange}
       defaultValue={defaultValue}
+      modal={false}
       onOpenChange={(open) => {
         if (open) {
           setSearchTerm("");
@@ -425,10 +426,10 @@ const SearchableSelect = ({ options, onValueChange, defaultValue, placeholder, t
       )}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
-      <SelectContent 
-        dir={dir} 
-        side="bottom" 
-        position="popper" 
+      <SelectContent
+        dir={dir}
+        side="bottom"
+        position="popper"
         className="w-[var(--radix-select-trigger-width)] z-[150] bg-white border-slate-200 p-0 shadow-2xl overflow-hidden rounded-2xl"
         // Prevent focus jumping back to trigger on mobile which closes the menu
         onCloseAutoFocus={(e) => e.preventDefault()}
@@ -502,14 +503,16 @@ const MultiSelect = ({ options, value = [], onChange, placeholder, t, hasError, 
     .map(opt => opt.label);
 
   return (
-    <DropdownMenu onOpenChange={(open) => {
-      if (open) {
-        setSearchTerm("");
-        setTimeout(() => {
-          if (inputRef.current) inputRef.current.focus({ preventScroll: true });
-        }, 150);
-      }
-    }}>
+    <DropdownMenu
+      modal={false}
+      onOpenChange={(open) => {
+        if (open) {
+          setSearchTerm("");
+          setTimeout(() => {
+            if (inputRef.current) inputRef.current.focus({ preventScroll: true });
+          }, 150);
+        }
+      }}>
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
@@ -664,8 +667,8 @@ export const FormInput = ({
           <SearchableSelect
             options={options}
             onValueChange={(value) => {
-                // Manually trigger react-hook-form change
-                setValue(name, value, { shouldValidate: true, shouldDirty: true });
+              // Manually trigger react-hook-form change
+              setValue(name, value, { shouldValidate: true, shouldDirty: true });
             }}
             defaultValue={props.defaultValue}
             placeholder={placeholder}

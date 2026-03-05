@@ -14,7 +14,7 @@ const Navbar = () => {
         i18n.changeLanguage(newLang);
     };
     const isRtl = i18n.language === 'ar';
-    const adminName = JSON.parse(localStorage.getItem("admin_info") || localStorage.getItem("user_info"))?.name || "Admin";
+    const userName = JSON.parse(localStorage.getItem("user_info"))?.name || "User";
 
     const handleLogout = () => {
         localStorage.clear();
@@ -26,7 +26,7 @@ const Navbar = () => {
             <div className="flex items-center gap-3">
                 <h2 className={`font-bold flex items-center gap-2 text-lg md:text-xl ${THEME.colors.accent}`}>
                     <UserCircle className="w-8 h-8 md:w-10 md:h-10 opacity-80" />
-                    <span className="truncate max-w-[150px] sm:max-w-none">{adminName}</span>
+                    <span className="truncate max-w-[150px] sm:max-w-none">{userName}</span>
                 </h2>
             </div>
 
