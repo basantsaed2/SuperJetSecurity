@@ -38,6 +38,9 @@ const resources = {
       "description_placeholder": "Noticeable engine noise, body scratches, etc...",
       "entry_time_label": "Entry Time",
       "register_entry_button": "Register Check-In",
+      "check_in_success": "Check-in registered successfully",
+      "selected_bus": "Selected Bus",
+      "qr_scan_success": "QR code scanned successfully",
 
       // --- CheckOut Form ---
       "inside_garage": "Inside Garage",
@@ -50,6 +53,19 @@ const resources = {
       "confirm_departure_desc": "Are you sure you want to authorize the exit for unit",
       "cancel": "Cancel",
       "authorize_exit": "Authorize Exit",
+      "driver_name": "Driver Name",
+      "driver_phone": "Driver Phone",
+      "driver_status": "Driver Status",
+      "bus_number": "Bus Number",
+      "plate_number": "Plate Number",
+      "bus_status": "Bus Status",
+      "garage_location": "Garage Location",
+      "view_details": "View Details",
+      "close": "Close",
+      "unknown_bus": "Unknown Bus",
+      "check_out_success": "Check-out registered successfully",
+      "check_out_error": "Check-out failed",
+
 
       // --- Shared ---
       "logout": "Logout",
@@ -98,6 +114,9 @@ const resources = {
       "description_placeholder": "ضوضاء المحرك، خدوش الهيكل، إلخ...",
       "entry_time_label": "وقت الدخول",
       "register_entry_button": "تسجيل الدخول",
+      "check_in_success": "تم تسجيل الدخول بنجاح",
+      "selected_bus": "الاتوبيس المحدد",
+      "qr_scan_success": "تم مسح كود الـ QR بنجاح",
 
       // --- CheckOut Form ---
       "inside_garage": "داخل الجراج",
@@ -110,6 +129,18 @@ const resources = {
       "confirm_departure_desc": "هل أنت متأكد من تصريح خروج الوحدة",
       "cancel": "إلغاء",
       "authorize_exit": "تصريح الخروج",
+      "driver_name": "اسم السائق",
+      "driver_phone": "هاتف السائق",
+      "driver_status": "حالة السائق",
+      "bus_number": "رقم الاتوبيس",
+      "plate_number": "رقم اللوحة",
+      "bus_status": "حالة الاتوبيس",
+      "garage_location": "موقع الجراج",
+      "view_details": "عرض التفاصيل",
+      "close": "إغلاق",
+      "unknown_bus": "اتوبيس غير معروف",
+      "check_out_success": "تم تسجيل الخروج بنجاح",
+      "check_out_error": "فشل تسجيل الخروج",
 
       // --- Shared ---
       "logout": "تسجيل الخروج",

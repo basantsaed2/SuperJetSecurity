@@ -1,17 +1,20 @@
 import React, { useState } from "react";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { Send, Clock, Loader2, Bus, MapPin, AlertCircle, Calendar, X, ShieldCheck } from "lucide-react";
+import { Send, Clock, Loader2, Bus, MapPin, AlertCircle, Calendar, UserCircle, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useUpdate } from "@/hooks/useUpdate";
 import { useGet } from "@/hooks/useGet";
 import { THEME } from "@/utils/theme";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
+import ConfirmCheckOutDialog from "../../components/custom/ConfirmCheckOutDialog";
+import CheckOutDetailsDialog from "../../components/custom/CheckOutDetailsDialog";
 
 const CheckOutForm = () => {
   const [confirmItem, setConfirmItem] = useState(null);
+  const [detailsItem, setDetailsItem] = useState(null);
   const { t, i18n } = useTranslation();
   const locale = i18n.language === 'ar' ? 'ar-EG' : 'en-GB';
+  const isRtl = i18n.language === 'ar';
 
   const { data: activeCheckIns, isLoading } = useGet(
     ["activeCheckIns"],
@@ -68,7 +71,7 @@ const CheckOutForm = () => {
                 </div>
                 <div>
                   <h4 className="font-black text-xl text-slate-800 uppercase leading-none mb-2">
-                    {item.busId.split('-')[0]}
+                    {item.bus?.busNumber || item.busNumber || t('unknown_bus')}
                   </h4>
                   <div className="flex flex-wrap items-center gap-4">
                     <span className="flex items-center gap-1.5 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">
@@ -79,6 +82,20 @@ const CheckOutForm = () => {
                       <Clock size={14} className="text-[#FFCC00]" />
                       {new Date(item.checkInTime).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })}
                     </span>
+                    {item.driver?.name && (
+                      <button
+                        onClick={() => setDetailsItem(item)}
+                        title={t('view_details')}
+                        className="flex items-center gap-2 text-[11px] font-extrabold text-[#003366] bg-blue-50/80 hover:bg-blue-100/80 px-3 py-1.5 rounded-full transition-all uppercase tracking-widest active:scale-95 border border-blue-100 shadow-sm"
+                      >
+                        <UserCircle size={14} className="text-[#003366]/50" />
+                        <span className="truncate max-w-[120px]">{item.driver.name}</span>
+                        <span className="bg-[#003366] text-white text-[9px] px-2 py-0.5 rounded-full lowercase tracking-normal flex items-center gap-1 shadow-md shadow-blue-900/20">
+                          <Eye size={10} />
+                          {t('view_details')}
+                        </span>
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -107,48 +124,21 @@ const CheckOutForm = () => {
       </div>
 
       {/* Confirm Dialog */}
-      <DialogPrimitive.Root open={!!confirmItem} onOpenChange={() => setConfirmItem(null)}>
-        <DialogPrimitive.Portal>
-          <DialogPrimitive.Overlay className="fixed inset-0 z-[200] bg-blue-950/40 backdrop-blur-md animate-in fade-in duration-300" />
-          <DialogPrimitive.Content className="fixed left-[50%] top-[50%] z-[201] w-[90vw] max-w-[450px] translate-x-[-50%] translate-y-[-50%] bg-white rounded-[2.5rem] shadow-2xl animate-in zoom-in-95 duration-300 overflow-hidden border-none outline-none">
+      <ConfirmCheckOutDialog
+        item={confirmItem}
+        onClose={() => setConfirmItem(null)}
+        onConfirm={handleFinalConfirm}
+        isPending={checkOutMutation.isPending}
+      />
 
-            <div className={cn("h-3 w-full", THEME.colors.primary)} />
+      {/* Details Dialog */}
+      <CheckOutDetailsDialog
+        item={detailsItem}
+        onClose={() => setDetailsItem(null)}
+        locale={locale}
+        isRtl={isRtl}
+      />
 
-            <div className="p-8 md:p-10 flex flex-col items-center text-center">
-              <div className="w-20 h-20 bg-blue-50 text-[#003366] rounded-[2rem] flex items-center justify-center mb-6 rotate-12">
-                <ShieldCheck size={40} />
-              </div>
-
-              <DialogPrimitive.Title className="text-2xl font-black text-slate-900 uppercase tracking-tighter mb-2">
-                {t('confirm_departure_title')}
-              </DialogPrimitive.Title>
-
-              <DialogPrimitive.Description className="text-slate-500 font-semibold leading-relaxed mb-8">
-                {t('confirm_departure_desc')} <span className="text-[#003366] font-black underline decoration-[#FFCC00] decoration-2 underline-offset-4">#{confirmItem?.busId.split('-')[0]}</span>?
-              </DialogPrimitive.Description>
-
-              <div className="flex w-full gap-3">
-                <DialogPrimitive.Close asChild>
-                  <Button variant="ghost" className="flex-1 h-14 rounded-2xl font-bold text-slate-400">
-                    {t('cancel')}
-                  </Button>
-                </DialogPrimitive.Close>
-                <Button
-                  onClick={handleFinalConfirm}
-                  disabled={checkOutMutation.isPending}
-                  className={cn("flex-[2] h-14 rounded-2xl font-black text-white uppercase tracking-widest shadow-xl", THEME.colors.primary)}
-                >
-                  {checkOutMutation.isPending ? <Loader2 className="animate-spin" /> : t('authorize_exit')}
-                </Button>
-              </div>
-            </div>
-
-            <DialogPrimitive.Close className="absolute top-6 right-6 text-slate-300 hover:text-slate-600 transition-colors">
-              <X size={24} />
-            </DialogPrimitive.Close>
-          </DialogPrimitive.Content>
-        </DialogPrimitive.Portal>
-      </DialogPrimitive.Root>
     </div>
   );
 };
