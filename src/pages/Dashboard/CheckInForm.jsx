@@ -41,7 +41,7 @@ const CheckInForm = ({ defaultTime }) => {
   // الحصول على رقم الحافلة المختارة لعرضه في حالة الـ "Scanned"
   const selectedBusNumber = useMemo(() => {
     const bus = busesList.find(b => String(b.id) === String(selectedBusId));
-    return bus ? bus.busNumber : null;
+    return bus ? `${bus.busNumber} - ${bus.plateNumber} - ${bus.busType?.name}` : null;
   }, [selectedBusId, busesList]);
 
   const stopScanner = async () => {
