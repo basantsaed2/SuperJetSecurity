@@ -148,7 +148,7 @@ const CheckInForm = ({ defaultTime }) => {
                     errors={errors}
                     setValue={setValue}
                     watch={watch}
-                    options={busesList.map(b => ({ label: b.busNumber, value: b.id }))}
+                    options={busesList.map(b => ({ label: `${b.busNumber} - ${b.plateNumber} - ${b.busType?.name}`, value: b.id }))}
                     placeholder={t('select_bus_placeholder')}
                     className="flex-1"
                   />
