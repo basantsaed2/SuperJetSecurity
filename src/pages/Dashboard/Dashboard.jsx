@@ -27,9 +27,45 @@ const Dashboard = () => {
     return now.toISOString().slice(0, 16);
   }, []);
 
+  const garageName = React.useMemo(() => {
+    return JSON.parse(localStorage.getItem("user_info"))?.garageName || "";
+  }, []);
+
   return (
     <div className={`min-h-screen ${THEME.colors.grayLight} p-3 md:p-8 transition-all duration-500`} dir={isRtl ? 'rtl' : 'ltr'}>
       <div className="max-w-4xl mx-auto">
+        {!activeTab && garageName && (
+          <div className="flex-1 relative overflow-hidden group mb-8">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#003366] to-[#004d99] opacity-[0.03] group-hover:opacity-[0.05] transition-opacity duration-500 rounded-[2.5rem]"></div>
+            <div className="relative bg-white/60 backdrop-blur-xl border border-white/80 shadow-[0_8px_30px_rgb(0,0,0,0.04)] px-6 py-5 rounded-[2.5rem] flex items-center gap-5 transition-all duration-500 hover:shadow-[0_20px_40px_rgb(0,0,0,0.06)] hover:-translate-y-1">
+              <div className="relative">
+                <div className="absolute inset-0 bg-[#003366] opacity-20 blur-lg rounded-full animate-pulse"></div>
+                <div className="relative bg-[#003366] p-4 rounded-2xl text-white shadow-xl shadow-blue-900/20">
+                  <ShieldCheck size={24} className="group-hover:rotate-12 transition-transform duration-500" />
+                </div>
+              </div>
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="w-1 h-3 bg-[#FFCC00] rounded-full"></span>
+                  <p className="text-[10px] font-extrabold text-[#003366]/40 uppercase tracking-[0.2em] leading-none">
+                    {t('garage_label')}
+                  </p>
+                </div>
+                <h2 className="text-2xl font-black text-[#003366] tracking-tight leading-none group-hover:tracking-normal transition-all duration-500">
+                  {garageName}
+                </h2>
+              </div>
+
+              {/* Decorative Elements */}
+              <div className={cn(
+                "absolute top-1/2 -translate-y-1/2 opacity-[0.03] pointer-events-none group-hover:scale-110 group-hover:opacity-[0.05] transition-all duration-700",
+                isRtl ? "left-6" : "right-6"
+              )}>
+                <Bus size={60} className={cn(isRtl && "-scale-x-100")} />
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Back Button */}
         {activeTab && (

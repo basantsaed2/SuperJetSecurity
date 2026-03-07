@@ -20,15 +20,18 @@ const CheckInForm = ({ defaultTime }) => {
   // جلب البيانات
   const { data: buses } = useGet(["buses"], "/api/user/security/buses");
   const { data: mainTypes } = useGet(["mainTypes"], "/api/user/security/maintenance-types");
+  const { data: drivers } = useGet(["drivers"], "/api/user/security/drivers");
 
   const busesList = useMemo(() => buses?.data || [], [buses]);
+  const driversList = useMemo(() => drivers?.data || [], [drivers]);
 
   const { register, handleSubmit, watch, reset, setValue, formState: { errors } } = useForm({
     defaultValues: {
       checkInTime: defaultTime,
       maintenanceTypeIds: [],
       description: "",
-      bus_id: ""
+      bus_id: "",
+      driverId: ""
     }
   });
 
@@ -79,7 +82,8 @@ const CheckInForm = ({ defaultTime }) => {
           checkInTime: defaultTime,
           maintenanceTypeIds: [],
           description: "",
-          bus_id: ""
+          bus_id: "",
+          driverId: ""
         });
         toast.success(t("check_in_success"));
       }
@@ -159,6 +163,19 @@ const CheckInForm = ({ defaultTime }) => {
               )}
             </div>
           )}
+
+          {/* Driver Selection */}
+          <FormInput
+            label={t('driver_label')}
+            name="driverId"
+            type="select"
+            register={register}
+            errors={errors}
+            setValue={setValue}
+            watch={watch}
+            options={driversList.map(d => ({ label: d.name, value: d.id }))}
+            placeholder={t('driver_placeholder')}
+          />
 
           {/* Maintenance Types - Multi Select */}
           <FormInput

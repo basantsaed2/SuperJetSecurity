@@ -20,15 +20,18 @@ const resources = {
 
       // --- Dashboard ---
       "main_menu": "Main Menu",
-      "check_in": "Check In",
-      "check_out": "Check Out",
-      "check_in_subtitle": "Register incoming buses",
-      "check_out_subtitle": "Release active units",
+      "check_in": "Bus Check-In",
+      "check_out": "Bus Check-Out",
+      "check_in_subtitle": "Register incoming buses for maintenance",
+      "check_out_subtitle": "Release active units for operation",
 
       // --- CheckIn Form ---
       "gate_entry_title": "Check In",
+      "garage_label": "Garage Name",
       "select_bus_label": "Select Bus",
       "select_bus_placeholder": "Search and select bus...",
+      "driver_label": "Driver",
+      "driver_placeholder": "Select driver...",
       "maintenance_label": "Maintenance Requirements",
       "maintenance_placeholder": "Select multiple maintenance types...",
       "description_label": "Description / Observations",
@@ -77,15 +80,18 @@ const resources = {
 
       // --- Dashboard ---
       "main_menu": "القائمة الرئيسية",
-      "check_in": "تسجيل الدخول",
-      "check_out": "تسجيل الخروج",
-      "check_in_subtitle": "تسجيل الاتوبيسات القادمة",
-      "check_out_subtitle": "تسجيل خروج الوحدات الحالية",
+      "check_in": "دخول اتوبيس",
+      "check_out": "خروج اتوبيس",
+      "check_in_subtitle": "تسجيل دخول اتوبيس للصيانة",
+      "check_out_subtitle": "تسجيل خروج اتوبيس للتشغيل",
 
       // --- CheckIn Form ---
       "gate_entry_title": "تسجيل دخول الاتوبيس",
+      "garage_label": "اسم الجراج",
       "select_bus_label": "اختر الاتوبيس",
       "select_bus_placeholder": "ابحث عن الاتوبيس...",
+      "driver_label": "السائق",
+      "driver_placeholder": "اختر السائق...",
       "maintenance_label": "متطلبات الصيانة",
       "maintenance_placeholder": "اختر أنواع الصيانة...",
       "description_label": "الوصف / الملاحظات",
